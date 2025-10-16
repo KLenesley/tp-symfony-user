@@ -18,18 +18,16 @@
 		<header>
 			<nav class="navbar navbar-expand-lg bg-body-tertiary">
 				<div class="container-fluid">
-					<a class="navbar-brand" href="#">Navbar</a>
+					<a class="navbar-brand" href="#">TP-USER</a>
 					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<span class="navbar-toggler-icon"></span>
 					</button>
 					<div class="collapse navbar-collapse" id="navbarSupportedContent">
 						<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 							<li class="nav-item">
-								<a class="nav-link active" aria-current="page" href="#">Home</a>
+								<a class="nav-link active" aria-current="page" href="/">Home</a>
 							</li>
-							<li class="nav-item">
-								<a class="nav-link" href="#">Link</a>
-							</li>
+							{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item dropdown">
 								<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 									Administration
@@ -41,17 +39,32 @@
 									<li>
 										<a class="dropdown-item" href="/product">Produits</a>
 									</li>
-									<li><hr class="dropdown-divider"></li>
+									{% if is_granted('ROLE_SUPER_ADMIN') %}
+									<li>
+										<a class="dropdown-item" href="/user">Utilisateurs</a>
+									</li>
+									{% endif %}
 								</ul>
 							</li>
-							<li class="nav-item">
-								<a class="nav-link disabled" aria-disabled="true">Disabled</a>
-							</li>
+							{% endif %}
 						</ul>
-						<form class="d-flex" role="search">
-							<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-							<button class="btn btn-outline-success" type="submit">Search</button>
-						</form>
+						{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+									{{ app.user.email }}
+									<ul class="dropdown-menu">
+										<li>
+											<a class="dropdown-item" href="/logout">Se déconnecter</a>
+										</li>
+									</ul>
+								</a>
+							</li>
+						{% else %}
+							<a class="nav-link" href="/login">Se connecter</a>
+							<br>
+							<a class="nav-link" href="/register">S'enregistrer</a>
+						{% endif %}
+
 					</div>
 				</div>
 			</nav>
