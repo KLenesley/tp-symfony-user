@@ -33,6 +33,8 @@ final class ProductController extends AbstractController
             $entityManager->persist($product);
             $entityManager->flush();
 
+            $this->logger->info("Le produit '{$product->getLabel()}' a été créé.");
+
             return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
         }
 

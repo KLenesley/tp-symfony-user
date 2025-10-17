@@ -2,13 +2,22 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    public Logger $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -17,6 +26,8 @@ class SecurityController extends AbstractController
 
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
+        
+        $this->logger->info("L'utilisateur '$lastUsername' a essayé de se connecter");
 
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
