@@ -86,6 +86,9 @@ class Product
 
     public function getPriceTtc(): ?string
     {
+        if (!isset($this->price_ttc)) {
+            $this->price_ttc = $this->price_ht + $this->price_tva;
+        }
         return $this->price_ttc;
     }
 
