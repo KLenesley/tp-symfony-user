@@ -58,4 +58,6 @@ when@test:
             users_in_memory:
                 memory:
                     users:
+                        user-test@gmail.com: { password: user-test, roles: ROLE_USER }
                         test@gmail.com: { password: test, roles: ROLE_ADMIN }
+                        s-admin-test@gmail.com: { password: s-admin-test, roles: ROLE_SUPER_ADMIN }

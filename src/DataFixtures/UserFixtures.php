@@ -35,13 +35,7 @@ class UserFixtures extends Fixture
         $superAdmin->setPassword($this->hasher->hashPassword($superAdmin, 's-admin'));
         $superAdmin->setRoles(['ROLE_SUPER_ADMIN']);
         $manager->persist($superAdmin);
-
-        $test = new User();
-        $test->setEmail('test@gmail.com');
-        $test->setPassword($this->hasher->hashPassword($test, 'test'));
-        $test->setRoles(['ROLE_ADMIN']);
-        $manager->persist($test);
-
+        
         $manager->flush();
     }
 }

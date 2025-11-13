@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 final class UserControllerTest extends WebTestCase
 {
@@ -18,6 +19,9 @@ final class UserControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
+        $testUser = new InMemoryUser('user-test@gmail.com', 'user-test', ['ROLE_USER']);
+        $this->client->loginUser($testUser);
+
         $this->manager = static::getContainer()->get('doctrine')->getManager();
         $this->userRepository = $this->manager->getRepository(User::class);
 
@@ -34,7 +38,7 @@ final class UserControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->path);
 
         self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('User index');
+        self::assertPageTitleContains('Liste des utilisateurs');
 
         // Use the $crawler to perform additional assertions e.g.
         // self::assertSame('Some text on the page', $crawler->filter('.p')->first()->text());
@@ -42,31 +46,28 @@ final class UserControllerTest extends WebTestCase
 
     public function testNew(): void
     {
-        $this->markTestIncomplete();
+        // $this->markTestIncomplete();
         $this->client->request('GET', sprintf('%snew', $this->path));
 
         self::assertResponseStatusCodeSame(200);
 
         $this->client->submitForm('Save', [
-            'user[email]' => 'Testing',
-            'user[roles]' => 'Testing',
-            'user[password]' => 'Testing',
-            'user[isVerified]' => 'Testing',
+            'user[email]' => 'test@example.com',
+            'user[password]' => 'password123',
         ]);
 
-        self::assertResponseRedirects($this->path);
+        self::assertResponseRedirects('/user');
 
         self::assertSame(1, $this->userRepository->count([]));
     }
 
     public function testShow(): void
     {
-        $this->markTestIncomplete();
+        // $this->markTestIncomplete();
         $fixture = new User();
-        $fixture->setEmail('My Title');
-        $fixture->setRoles('My Title');
-        $fixture->setPassword('My Title');
-        $fixture->setIsVerified('My Title');
+        $fixture->setEmail('show@example.com');
+        $fixture->setRoles(['ROLE_USER']);
+        $fixture->setPassword('hashedPassword');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -81,12 +82,11 @@ final class UserControllerTest extends WebTestCase
 
     public function testEdit(): void
     {
-        $this->markTestIncomplete();
+        // $this->markTestIncomplete();
         $fixture = new User();
-        $fixture->setEmail('Value');
-        $fixture->setRoles('Value');
-        $fixture->setPassword('Value');
-        $fixture->setIsVerified('Value');
+        $fixture->setEmail('edit@example.com');
+        $fixture->setRoles(['ROLE_USER']);
+        $fixture->setPassword('hashedPassword');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -94,30 +94,24 @@ final class UserControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
 
         $this->client->submitForm('Update', [
-            'user[email]' => 'Something New',
-            'user[roles]' => 'Something New',
-            'user[password]' => 'Something New',
-            'user[isVerified]' => 'Something New',
+            'user[email]' => 'update@example.com',
+            'user[password]' => 'Password123',
         ]);
 
-        self::assertResponseRedirects('/user/');
+        self::assertResponseRedirects('/user');
 
         $fixture = $this->userRepository->findAll();
 
-        self::assertSame('Something New', $fixture[0]->getEmail());
-        self::assertSame('Something New', $fixture[0]->getRoles());
-        self::assertSame('Something New', $fixture[0]->getPassword());
-        self::assertSame('Something New', $fixture[0]->getIsVerified());
+        self::assertSame('update@example.com', $fixture[0]->getEmail());
     }
 
     public function testRemove(): void
     {
-        $this->markTestIncomplete();
+        // $this->markTestIncomplete();
         $fixture = new User();
-        $fixture->setEmail('Value');
-        $fixture->setRoles('Value');
-        $fixture->setPassword('Value');
-        $fixture->setIsVerified('Value');
+        $fixture->setEmail('delete@example.com');
+        $fixture->setRoles(['ROLE_USER']);
+        $fixture->setPassword('hashedPassword');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -125,7 +119,7 @@ final class UserControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
         $this->client->submitForm('Delete');
 
-        self::assertResponseRedirects('/user/');
+        self::assertResponseRedirects('/user');
         self::assertSame(0, $this->userRepository->count([]));
     }
 }

@@ -37,6 +37,7 @@ final class ProductControllerTest extends WebTestCase
 
     public function testIndex(): void
     {
+        
         $this->client->followRedirects();
         $crawler = $this->client->request('GET', $this->path);
 
@@ -63,7 +64,7 @@ final class ProductControllerTest extends WebTestCase
             // 'product[categories]' => 'Testing',
         ]);
 
-        self::assertResponseRedirects($this->path);
+        self::assertResponseRedirects('/product');
 
         self::assertSame(1, $this->productRepository->count([]));
     }
@@ -115,14 +116,14 @@ final class ProductControllerTest extends WebTestCase
             // 'product[categories]' => 'Something New',
         ]);
 
-        self::assertResponseRedirects('/product/');
+        self::assertResponseRedirects('/product');
 
         $fixture = $this->productRepository->findAll();
 
         self::assertSame('Something New', $fixture[0]->getLabel());
-        self::assertSame(100, $fixture[0]->getPriceHt());
-        self::assertSame(20, $fixture[0]->getPriceTva());
-        self::assertSame(120, $fixture[0]->getPriceTtc());
+        self::assertSame(100.0, (float) $fixture[0]->getPriceHt());
+        self::assertSame(20.0, (float) $fixture[0]->getPriceTva());
+        self::assertSame(120.0, (float) $fixture[0]->getPriceTtc());
         self::assertSame('Something New', $fixture[0]->getDescription());
         // self::assertSame('Something New', $fixture[0]->getCategories());
     }
@@ -144,7 +145,7 @@ final class ProductControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
         $this->client->submitForm('Delete');
 
-        self::assertResponseRedirects('/product/');
+        self::assertResponseRedirects('/product');
         self::assertSame(0, $this->productRepository->count([]));
     }
 }
